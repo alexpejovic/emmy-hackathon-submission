@@ -2,7 +2,7 @@
 
 ## What is here
 
-Each folder holds one problem's kernel, compiled two ways by `src/compile.py`:
+Each folder holds one problem's kernel, compiled two ways by `compile.py`:
 
 | File | What it is |
 |---|---|
@@ -20,8 +20,8 @@ To regenerate one folder, for example `r02_big_sum`:
 
 ```sh
 cd r02_big_sum
-python ../../../src/compile.py k_sum_1_reduce.ir.json          > k_sum_1_reduce.cse.ptx
-python ../../../src/compile.py k_sum_1_reduce.ir.json --no_cse > k_sum_1_reduce.nocse.ptx
+python ../../../compile.py k_sum_1_reduce.ir.json          > k_sum_1_reduce.cse.ptx
+python ../../../compile.py k_sum_1_reduce.ir.json --no_cse > k_sum_1_reduce.nocse.ptx
 ptxas -arch=sm_120 k_sum_1_reduce.cse.ptx -o /tmp/k.cubin && cuobjdump -sass /tmp/k.cubin > k_sum_1_reduce.cse.sass
 ```
 

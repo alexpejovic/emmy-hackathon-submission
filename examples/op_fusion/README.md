@@ -49,8 +49,8 @@ To regenerate one folder, for example `p02_scale_shift`:
 
 ```sh
 cd p02_scale_shift
-python ../../../src/compile.py k_add_pointwise.ir.json             > k_add_pointwise.fusion.ptx
-python ../../../src/compile.py k_add_pointwise.ir.json --no_fusion > k_add_pointwise.nofusion.ptx
+python ../../../compile.py k_add_pointwise.ir.json             > k_add_pointwise.fusion.ptx
+python ../../../compile.py k_add_pointwise.ir.json --no_fusion > k_add_pointwise.nofusion.ptx
 ptxas -arch=sm_120 k_add_pointwise.fusion.ptx -o /tmp/k.cubin && cuobjdump -sass /tmp/k.cubin > k_add_pointwise.fusion.sass
 ```
 
