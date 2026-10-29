@@ -1,32 +1,40 @@
 PYTHON    ?= 3.12.12
 VENV      ?= .venv
-EMMY_VENV ?= .venv-emmy
 COMPILER  ?= compile.py
 PTXGEN	  ?= ptxgen
+EMMY      ?= $(VENV)/bin/emmy
+TARGET    ?= sm_89
 TORCH_IDX := https://download.pytorch.org/whl/cpu
 
-.PHONY: envs clean-envs lint fmt compile-check ptxas-check myptx refptx submit-compiler \
-	submit-closed submit-ref bench
+.PHONY: envs clean lint compile-check submit-compiler submit-closed submit-ref generate-problems \
+	install_devtools
+
 envs: $(VENV)
 
 $(VENV):
 	python -m venv $(VENV)
 	$(VENV)/bin/python -m pip install --upgrade pip
 	$(VENV)/bin/pip install emmy-ml==0.3.11 numpy requests torch
+
+install_devtools:
 	$(VENV)/bin/pip install torch ruff mypy "nvidia-cuda-nvcc-cu12>=12.9.86" # dev additions
 
 clean:
 	rm -rf $(VENV)
 
-lint:
+lint: $(VENV)
 	$(VENV)/bin/ruff format
 	$(VENV)/bin/ruff check --fix
 	$(VENV)/bin/mypy $(PTXGEN) --strict
 	$(VENV)/bin/mypy $(COMPILER) --strict
 
-# Compile every problem IR with $(COMPILER); lenient (always exits 0) until all open problems
-# compile. Running compile.py as a script keeps the emmy/ checkout from shadowing the package.
-compile-check:
+generate-problems: $(VENV)
+	@rc=0; \
+	$(VENV)/bin/python tools/generate.py --emmy $(EMMY) --target $(TARGET) --out problems tools/expressions_open.py || rc=1; \
+	$(VENV)/bin/python tools/generate.py --emmy $(EMMY) --target $(TARGET) --out problems/closed tools/expressions_closed.py || rc=1; \
+	exit $$rc
+
+compile-check: $(VENV)
 	@ok=0; failed=0; \
 	for ir in problems/*/*.ir.json problems/closed/*/*.ir.json; do \
 		if $(VENV)/bin/python $(COMPILER) "$$ir" > /dev/null 2>&1; then \
@@ -37,13 +45,12 @@ compile-check:
 	done; \
 	echo "$$ok ok, $$failed failed"
 
-# Submit every open problem through $(COMPILER); keeps going on failure, prints a tally
-submit-compiler:
+submit-compiler: $(VENV)
 	@ok=0; failed=0; \
 	cd emmy-hackathon-2026 && for d in problems/*/; do \
 	        p=$$(basename "$$d"); [ -f "$$d/meta.json" ] || continue; \
 	        echo "== $$p"; \
-	        if ../.venv/bin/python submit.py "$$p" --compiler $(abspath $(COMPILER)); then \
+	        if $(abspath $(VENV))/bin/python submit.py "$$p" --compiler $(abspath $(COMPILER)); then \
 	                ok=$$((ok + 1)); \
 	        else \
 	                echo "FAIL $$p"; failed=$$((failed + 1)); \
@@ -51,8 +58,7 @@ submit-compiler:
 	done; \
 	echo "$$ok ok, $$failed failed"
 
-# Submit every closed problem (by folder path) through $(COMPILER)
-submit-closed:
+submit-closed: $(VENV)
 	@ok=0; failed=0; \
 	for d in problems/closed/*/; do \
 	        echo "== $$d"; \

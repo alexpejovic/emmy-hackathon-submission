@@ -13,12 +13,15 @@ flag that turns it off, so its effect can be measured on its own.
 - [Files](#files)
 - [Optimizations](#optimizations)
 - [Limits](#limits)
-- [Change log](#change-log)
 
 ## Quick start
 
+First, ensure `python --version` gives something >=3.12. Then,
+
 ```sh
-python src/compile.py problems/p01_vector_add/k_add_pointwise.ir.json > out.ptx
+make .venv
+git submodule update --init --recursive
+.venv/bin/python compile.py problems/p01_vector_add/k_add_pointwise.ir.json > out.ptx
 ```
 
 The compiler reads two files:
