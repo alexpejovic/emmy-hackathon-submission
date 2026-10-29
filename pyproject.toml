@@ -1,0 +1,39 @@
+[project]
+name = "ptxgen"
+version = "0.1.0"
+description = "Kernel IR -> PTX Compiler"
+authors = [
+    { name = "Alex Pejovic", email = "62117049+alexpejovic@users.noreply.github.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "ipython>=9.17.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "emmy-ml",
+    "numpy>=2.5.4",
+    "nvidia-cuda-nvcc-cu12>=12.9.86",
+    "pytest>=9.1.1",
+    "ruff>=0.12",
+    "torch",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+include = ["ptxgen/*.py", "compile.py"] 
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.mypy]
+disable_error_code = ["import-untyped"]
