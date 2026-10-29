@@ -21,7 +21,19 @@ First, ensure `python --version` gives something >=3.12. Then,
 ```sh
 make .venv
 git submodule update --init --recursive
-.venv/bin/python compile.py problems/p01_vector_add/k_add_pointwise.ir.json > out.ptx
+.venv/bin/python compile.py emmy-hackathon-2026/problems/p01_vector_add/k_add_pointwise.ir.json
+```
+
+Optionally, you can generate a bunch of example problems
+
+```sh
+make generate-problems
+```
+
+and then generate PTX code for each problem with
+
+```sh
+make myptx
 ```
 
 The compiler reads two files:

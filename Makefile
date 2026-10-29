@@ -7,7 +7,7 @@ TARGET    ?= sm_89
 TORCH_IDX := https://download.pytorch.org/whl/cpu
 
 .PHONY: envs clean lint compile-check submit-compiler submit-closed submit-ref generate-problems \
-	install_devtools
+	install_devtools myptx
 
 envs: $(VENV)
 
@@ -44,6 +44,9 @@ compile-check: $(VENV)
 		fi; \
 	done; \
 	echo "$$ok ok, $$failed failed"
+
+myptx:
+	PYTHON=$(VENV)/bin/python COMPILER=$(COMPILER) tools/gen_my_ptx.sh
 
 submit-compiler: $(VENV)
 	@ok=0; failed=0; \
